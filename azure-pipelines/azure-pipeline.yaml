@@ -1,0 +1,54 @@
+trigger:
+ paths:
+   include:
+     - '/*'
+ branches:
+   include:
+    - main
+  
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: TerraformTaskV4@0
+  displayName: 'Install Terraform'
+  inputs:
+    terraformVersion: 'latest'
+
+- checkout: self
+  displayName: 'Checkout repository'
+
+- task: TerraformTaskV4@1
+  displayName: 'Terraform Init'
+  inputs:
+    command: 'init'
+    workingDirectory: '$(Build.SourcesDirectory)'
+    backendType: 'azurerm'
+    ensureBackend: true
+    backendServiceArm: 'Konjur Azure Connect'
+    resourceGroupName: 'rg-konjur-saas-l0'
+    storageAccountName: 'stknjdevz1dta001'
+    containerName: 'lvl0'
+    key: 'T5D37TjAO4lwWRmMBIOQR997S8+bf1j983ePN5f3RiY+yN9XKabukYr7SoOzsHi1gGMmDSDWWp/u+AStLReonQ=='
+
+- task: TerraformTaskV3@3
+  displayName: 'Terraform Validate'
+  inputs:
+    command: 'validate'
+    workingDirectory: '$(Build.SourcesDirectory)'
+    
+- task: TerraformTaskV3@3
+  displayName: 'Terraform Plan'
+  inputs:
+    command: 'plan'
+    workingDirectory: '$(Build.SourcesDirectory)'
+    environmentServiceName: 'Konjur Azure Connect'
+    commandOptions: '-out=tfplan'
+
+- task: TerraformTaskV3@3
+  displayName: 'Terraform Apply'
+  inputs:
+    command: 'apply'
+    workingDirectory: '$(Build.SourcesDirectory)'
+    environmentServiceName: 'Konjur Azure Connect'
+    commandOptions: '-auto-approve -input=false tfplan'

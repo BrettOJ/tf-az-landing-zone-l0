@@ -1,0 +1,25 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: TerraformInstaller@1
+  inputs:
+    terraformVersion: 'latest'
+
+- task: TerraformTaskV4@4
+  inputs:
+    provider: 'azurerm'
+    command: 'init'
+    backendServiceArm: 'Konjur Az subscription(1)(95328200-66a3-438f-9641-aeeb101e5e37)'
+    backendAzureRmResourceGroupName: 'rg-konjur-saas-l0'
+    backendAzureRmStorageAccountName: 'stknjdevz1dta001'
+    backendAzureRmContainerName: 'lvl0'
+    backendAzureRmKey: 'T5D37TjAO4lwWRmMBIOQR997S8+bf1j983ePN5f3RiY+yN9XKabukYr7SoOzsHi1gGMmDSDWWp/u+AStLReonQ=='
